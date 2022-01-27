@@ -1,32 +1,31 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-const blogger = require('../models/blogger')
+const blogger = require("../models/blogger");
 
-router.get('/', (req,res)=>{
-    if(req.session.user && req.cookies.blogger_sid) {
-        res.redirect('/dashboard')
-    }else{
-        res.render('login')
-    }
-    
-})
+router.get("/", (req, res) => {
+  if (req.session.user && req.cookies.blogger_sid) {
+    res.redirect("/dashboard");
+  } else {
+    res.render("login", { msg: null });
+  }
+});
 
-router.post('/', async (req, res) =>{
-    try {
-        const user = await blogger.findOne({
-            username : req.body.username,
-            password: req.body.password
-        });
-        if(user) {
-            req.session.user = user;
-            res.redirect('/dashboard')
-        }else{
-            res.send("failed")
-        }
-        
-    } catch (error) {
-        res.status(500).send(error)
+router.post("/", async (req, res) => {
+  console.log(req.body);
+  try {
+    const user = await blogger.findOne({
+      username: req.body.username,
+      password: req.body.password,
+    });
+    if (user) {
+      req.session.user = user;
+      res.redirect("/dashboard");
+    } else {
+      return res.render("login", { msg: "username or password is wrong" });
     }
-})
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 module.exports = router;
